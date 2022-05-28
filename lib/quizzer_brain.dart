@@ -1,6 +1,8 @@
 import 'question.dart';
 
-class QuizzlerBrain {
+class QuizzerBrain {
+  int _index = 0;
+
   final List<Question> _questionBank = [
     Question(content: "Question 1", answer: true),
     Question(content: "Question 2", answer: false),
@@ -14,19 +16,19 @@ class QuizzlerBrain {
     Question(content: "Question 10", answer: false),
   ];
 
-  int _questionIndex = 0;
-
-  void setQuestionIndex(int index) {
-    _questionIndex = index;
+  bool isLastQuestion() {
+    return _index == _questionBank.length - 1;
   }
 
-  void getNextQuestion() {
-    if (_questionIndex < _questionBank.length) {
-      _questionIndex++;
-    }
+  void nextQuestion() {
+    _index++;
   }
 
-  void getQuestionContent() => _questionBank[_questionIndex];
+  void resetIndex() {
+    _index = 0;
+  }
 
-  void getQuestionAnswer() => _questionBank[_questionIndex];
+  String getQuestionContent() => _questionBank[_index].content;
+
+  bool getQuestionAnswer() => _questionBank[_index].answer;
 }

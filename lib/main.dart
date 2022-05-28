@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'quizzer_brain.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -8,7 +9,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      title: "Quizzler",
+      title: "Quizzer",
       debugShowCheckedModeBanner: false,
       color: Colors.white,
       home: Scaffold(
@@ -30,45 +31,62 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Icon> scoreKeeper = [];
+  QuizzerBrain questionBrain = QuizzerBrain();
 
-  Icon trueIcon() {
+  Icon TrueIcon() {
     return const Icon(
       Icons.check,
       color: Colors.green,
     );
   }
 
-  Icon falseIcon() {
+  Icon FalseIcon() {
     return const Icon(
-      Icons.check,
+      Icons.close,
       color: Colors.red,
     );
   }
 
-  void init() {
+  void onReset() {
     setState(() {
+      // questionBrain.resetIndex();
       scoreKeeper = [];
     });
   }
 
   void addTrueIconToScoreKeeper() {
     setState(() {
-      scoreKeeper.add(trueIcon());
+      scoreKeeper.add(TrueIcon());
     });
   }
 
   void addFalseIconToScoreKeeper() {
     setState(() {
-      scoreKeeper.add(falseIcon());
+      scoreKeeper.add(FalseIcon());
     });
   }
 
-  void onTruePressed() {
-    addTrueIconToScoreKeeper();
+  void onProcessDisplayAnswer({required bool userAnswer}) {
+    bool result = onCheckUserAnswer(userAnswer: userAnswer);
+    result ? addTrueIconToScoreKeeper() : addFalseIconToScoreKeeper();
   }
 
-  void onFalsePressed() {
-    addFalseIconToScoreKeeper();
+  void onButtonPressed({required bool userAnswer}) {
+    if (!questionBrain.isLastQuestion()) {
+      onProcessDisplayAnswer(userAnswer: userAnswer);
+      questionBrain.nextQuestion();
+    } else {
+      onProcessDisplayAnswer(userAnswer: userAnswer);
+      questionBrain.resetIndex();
+    }
+    if (scoreKeeper.length == 10) {
+      onReset();
+    }
+  }
+
+  bool onCheckUserAnswer({required bool userAnswer}) {
+    bool theAnswer = questionBrain.getQuestionAnswer();
+    return userAnswer == theAnswer;
   }
 
   @override
@@ -78,13 +96,11 @@ class _HomePageState extends State<HomePage> {
         Expanded(
           flex: 17,
           child: Container(
-            // height: double.infinity,
-            // width: double.infinity,
             color: Colors.blueGrey,
-            child: const Center(
+            child: Center(
               child: Text(
-                "Question content",
-                style: TextStyle(
+                questionBrain.getQuestionContent(),
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 30.0,
                 ),
@@ -98,8 +114,10 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               flex: 1,
               child: FlatButton(
-                padding: EdgeInsets.all(0),
-                onPressed: () {},
+                padding: const EdgeInsets.all(0),
+                onPressed: () {
+                  onButtonPressed(userAnswer: true);
+                },
                 child: Container(
                   height: double.infinity,
                   width: double.infinity,
@@ -119,8 +137,10 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               flex: 1,
               child: FlatButton(
-                padding: EdgeInsets.all(0),
-                onPressed: () {},
+                padding: const EdgeInsets.all(0),
+                onPressed: () {
+                  onButtonPressed(userAnswer: false);
+                },
                 child: Container(
                   height: double.infinity,
                   width: double.infinity,
